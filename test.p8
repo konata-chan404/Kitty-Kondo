@@ -7,17 +7,51 @@ print("does this work? i think it does lets hope kek")
 
 print("it sure does!")
 
+-- Structs!
+
+-- Weierd player movement struct? I'm surpised this is legal lol Lua is werid
+player = {}
+player.movementSpeed = 10
+player.xPos = 32
+player.yPos = 32
+
 function _init()
 
 end
 
 function _update()
-
+    _playerMovement()
 end 
 
 function _draw()
-
+    -- Draw simple background
+    rectfill(0,0,127,127,5)
+    -- draw player circle for now
+    circfill(player.xPos, player.yPos,7,8);
 end
+
+
+-- Player movement
+function _playerMovement()
+    -- At the moment we'll use a simple circle for the player
+    if (btn(0)) 
+    then
+        player.xPos=player.xPos-1
+    end
+    if (btn(1)) 
+    then
+        player.xPos=player.xPos+1
+    end
+    if (btn(2)) 
+    then
+        player.yPos=player.yPos-1
+    end
+    if (btn(3)) 
+    then
+        player.yPos=player.yPos+1
+    end
+end
+
 
 __gfx__
 000002020000b000ccccc77700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
