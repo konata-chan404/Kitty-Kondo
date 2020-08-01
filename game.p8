@@ -27,7 +27,7 @@ function _draw()
 	draw_entity_outline(player, 0)
 
 	-- Draw a wall to test collisions
-	//draw_entity(box)
+	-- //draw_entity(box)
 
 	map()
 	camera()
@@ -71,13 +71,22 @@ function create_player()
 
 			-- Check for collision between the player and the 'box'
 			newx = self.xpos - self.movement_speed
-			if not is_collidable(newx, self.ypos)
+
+			-- If a box exists at the next player position
+			if (is_box(newx, self.ypos))
+			then
+				-- box exists, move box
+				boxtomove = get_box()
+				boxtomove:move(0, self.movement_speed)
+				self.xpos = newx
+
+			-- if the next position in the graph does not have anything collidable
+			-- Move the player that way
+			elseif not is_collidable(newx, self.ypos)
 			then
 				self.xpos = newx
 			end
 		end
-			-- self.xpos -= self.movement_speed
-		
 		if (btnp(1)) -- move right
 		then
 			self.flip = false
@@ -89,8 +98,6 @@ function create_player()
 				self.xpos = newx
 			end
 		end
-			-- self.xpos += self.movement_speed
-		
 		if (btnp(2)) -- move down
 		then
 			-- Check for collision between the player and the 'box'
@@ -100,8 +107,6 @@ function create_player()
 				self.ypos = newy
 			end
 		end
-			-- self.ypos -= self.movement_speed
-		
 		if (btnp(3)) -- move up
 		then
 			-- Check for collision between the player and the 'box'
@@ -112,7 +117,7 @@ function create_player()
 			end
 		end
 	end
-			-- self.ypos += self.movement_speed
+
 	}
 end
 
@@ -122,10 +127,58 @@ function create_box()
 		xpos = 60,
 		ypos = 100,
 		sprite = 1, 
+
+		-- For boxes, have this werid function thingy that will be called. Just need to pass a move direction in
+		-- when calling it.
+		moveBox = function(self, movedir, movement_speed)
+			local newx, newy
+
+			if (movedir == 0)  -- Move left
+			then
+				self.flip = true
+
+				-- Check for collision between the player and the 'box'
+				newx = self.xpos - smovement_speed
+				if not is_collidable(newx, self.ypos)
+				then
+					self.xpos = newx
+				end
+			end
+			if (movedir == 1) -- move right
+			then
+				self.flip = false
+
+				-- Check for collision between the player and the 'box'
+				newx = self.xpos + movement_speed
+				if not is_collidable(newx, self.ypos)
+				then
+					self.xpos = newx
+				end
+			end
+			if (movedir == 2) -- move down
+			then
+				-- Check for collision between the player and the 'box'
+				newy = self.ypos - movement_speed
+				if not is_collidable(self.xpos, newy)
+				then
+					self.ypos = newy
+				end
+			end
+			if (movedir == 3) -- move up
+			then
+				-- Check for collision between the player and the 'box'
+				newy = self.ypos + movement_speed
+				if not is_collidable(self.xpos, newy)
+				then
+					self.ypos = newy
+				end
+			end
+		end
 		}
 	add(boxes, new_box)
-
 end
+
+
 
 
 -------------------------------------------------------------
@@ -162,11 +215,29 @@ function is_collidable(xpos, ypos)
 	return fget(mget(xpos/8, ypos/8), 0)
 end
 
-
+-- Returns if box exists at position.
+-- Not a specific box, but any box
 function is_box(xpos, ypos)
 	-- if sprite id is a box thing
 	return mget(xpos, ypos) == 3
 end
+
+-- Loop through the box array, find the exact box in the position
+function get_box(xpos, ypos)
+	for box in all(boxes)
+	do
+		if (box.xpos == xpos and box.ypos == ypos)
+		then
+			return box
+		end
+	end
+
+	return false
+
+end 
+
+
+
 -->8
 --------------------------------------
 -- Tab 2
