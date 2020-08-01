@@ -6,14 +6,16 @@ __lua__
 --------------------------------------
 
 -- Main pico functions
-
+swag = 0
 function _init()
 	-- make pico 64x64
 	poke(0x5f2c,3)
-	boxes = {}
 
+	create_game_stuff()
 	create_player()
 	create_box()
+
+	load_level(0, 0, 7, 7)
 end
 
 function _update()
@@ -29,10 +31,12 @@ function _draw()
 	-- Draw a wall to test collisions
 	-- //draw_entity(box)
 
-	map()
+	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
 	camera()
 
 	draw_entity_outline(player, 0)
+
+	print(swag)
 end
 
 -->8
@@ -276,9 +280,9 @@ function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
   for dy=-1,0 do
   	for dx=-1,1 do
   		if abs(dy) - abs(dx) ~= 0 then
-					entity.xpos = og_xpos + dx
-					entity.ypos = og_ypos + dy
-					draw_entity(entity, w, h, flip_x, flip_y)
+				entity.xpos = og_xpos + dx
+				entity.ypos = og_ypos + dy
+				draw_entity(entity, w, h, flip_x, flip_y)
   		end
   	end
   end
@@ -294,26 +298,37 @@ function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
  	draw_entity(entity, w, h, flip_x, flip_y)
 end
 
-
-function load_level(cely_start, cely_end)
-	for cely = cely_start, cely_end 
-	do
-		celx = 0 // or plaer.x // 8 or something idk
-		repeat
-			// blah blah 
-			
-			// initializing objects 
-			// getting player spawnpoint
-			// getting block points thing
-			// and probably other stuff
-			
-			// blah blah
-			
-			celx += 1
-		until ( is_level_border(celx, cely) ) 
-	end
-
+function create_game_stuff()
+	boxes = {}
+	levels = {}
+	current_level = {}
 end
+
+
+function load_level(celx_start, cely_start, celx_end, cely_end)
+	local current_sprite
+
+	current_level = {
+		celx = celx_start,
+		cely = cely_start,
+		sx = 0,
+		sy = 0,
+		celw = celx_end - celx_start + 1,
+		celh = cely_end - cely_start + 1
+		-- maybe palette stuff
+	}
+
+	-- maybe palette changing stuff here
+
+	for cely = cely_start, cely_end do
+		for celx = celx_start, cely_end do
+			if is_box(celx, cely) then
+				swag += 1
+			end
+		end	
+	end
+end
+
 __gfx__
 00090040000900400000000065566556333333330000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00089980000899800000000066666666333333330000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -335,3 +350,5 @@ __map__
 0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0403040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+__sfx__
+00010000000002f0502c0502b050000002c050000002e050000002f050000002f050000002f050000002c050270501b0501b05000000000001c050000001f0500000020050000002205000000220500000021050
