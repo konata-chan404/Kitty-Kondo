@@ -1,27 +1,12 @@
 pico-8 cartridge // http://www.pico-8.com
 version 29
 __lua__
-print("hii does this work")
-
-print("does this work? i think it does lets hope kek")
-
-print("it sure does!")
-
--- Structs!
-
--- Player movement struct!tttttttt
-player = {
-    movementspeed = 2,
-    xpos = 32,
-    ypos = 32
-}
-
 function _init()
-
+	create_player()
 end
 
 function _update()
-    _playermovement()
+ player:move()
 end 
 
 function _draw()
@@ -54,6 +39,64 @@ function _playermovement()
 end
 
 
+-->8
+-- player stuff!!
+
+function create_player()
+	player = {
+    movement_speed = 2,
+    xpos = 32,
+    ypos = 32,
+	
+				-- Player movement
+				move = function(self)
+				    -- At the moment we'll use a simple circle for the player
+				    if (btn(0)) 
+				   	then
+				        self.xpos -= self.movement_speed
+				    end
+				    
+				    if (btn(1)) 
+				    then
+				        self.xpos += self.movement_speed
+				    end
+				    
+				    if (btn(2)) 
+				    then
+				        self.ypos -= self.movement_speed
+				    end
+				    
+				    if (btn(3)) 
+				    then
+				        self.ypos += self.movement_speed
+				    end
+				end
+	}
+
+end
+		
+-->8
+-- utility functions!!
+
+function load_level(cely_start, cely_end)
+    for cely = cely_start, cely_end 
+    do
+        celx = 0 // or plaer.x // 8 or something idk
+        repeat
+            // blah blah 
+            
+            // initializing objects 
+            // getting player spawnpoint
+            // getting block points thing
+            // and probably other stuff
+            
+            // blah blah
+            
+            celx += 1
+        until ( is_level_border(celx, cely) ) 
+    end
+
+end
 __gfx__
 000002020000b000ccccc77700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000222000b0000c777cccc00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
