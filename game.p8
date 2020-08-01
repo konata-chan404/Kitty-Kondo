@@ -10,6 +10,7 @@ __lua__
 function _init()
 	-- make pico 64x64
 	poke(0x5f2c,3)
+	boxes = {}
 
 	create_player()
 	create_box()
@@ -115,11 +116,13 @@ end
 
 -- Test creation of box, similar to create_player
 function create_box()
-	box = {
+	local new_box = {
 		xpos = 60,
 		ypos = 100,
-		sprite = 1,
-	}
+		sprite = 1, 
+		}
+	add(boxes, new_box)
+
 end
 
 
