@@ -155,9 +155,9 @@ end
 -- returns if the sprite in the xpos and ypos has the collide flag
 function is_collidable(xpos, ypos)
 	return fget(mget(xpos/8, ypos/8), 0)
-		or fget(mget((xpos+8)/8, ypos/8), 0)
-		or fget(mget(xpos/8, (ypos+8)/8), 0)
-		or fget(mget((xpos+8)/8, (ypos+8)/8), 0)
+		or fget(mget((xpos+7)/8, ypos/8), 0)
+		or fget(mget(xpos/8, (ypos+7)/8), 0)
+		or fget(mget((xpos+7)/8, (ypos+7)/8), 0)
 end
 
 
