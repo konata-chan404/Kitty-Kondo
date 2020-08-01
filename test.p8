@@ -58,6 +58,12 @@ end
 -- draws entity based on its x and y vars
 -- takes entity and spr() params
 function draw_entity(entity, w, h, flip_x, flip_y)
+	-- default values
+	w = w or 1
+	h = h or 1
+	flip_x = flip_x or false
+	flip_y = flip_y or false
+	
 	spr(entity.sprite, entity.xpos, entity.ypos, w, h, flip_x, flip_y)
 end
 
@@ -66,34 +72,35 @@ end
 -- its 4am im not going to write comments lol
 
 function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
+
   -- makes all colors black
   for c=1,15 do
     pal(c,col_outline)
   end
+  
   -- draws sprite's shape with col_outline color
   local og_xpos = entity.xpos
   local og_ypos = entity.ypos
   
-  for dx=-1,1 do
-					entity.xpos += dx
-					draw_entity(entity, col_outline, w, h, flip_x, flip_y)
+  for dy=-1,0 do
+  	for dx=-1,1 do
+  		if abs(dy) - abs(dx) ~= 0 then
+					entity.xpos = og_xpos + dx
+					entity.ypos = og_ypos + dy
+					draw_entity(entity, w, h, flip_x, flip_y)
+  		end
+  	end
   end
   
   entity.xpos = og_xpos
-  
-  for dy=0,1 do
-  	entity.ypos += dy
-  	draw_entity(entity, col_outline, w, h, flip_x, flip_y)
-		end
-		
-		entity.ypos = og_ypos
+  entity.ypos = og_ypos
 		  
   -- returns all of the colors
   -- might need to change that if we'll do custom palette
   pal()
   
   -- finally draws teh actual thing
- 	draw_entity(entity, col_outline, w, h, flip_x, flip_y)
+ 	draw_entity(entity, w, h, flip_x, flip_y)
 end
 
 
