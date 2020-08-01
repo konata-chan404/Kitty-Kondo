@@ -15,7 +15,7 @@ function _init()
 
 	create_game_stuff()
 	create_player()
-	create_box()
+	-- create_box()
 
 	load_level(0, 0, 7, 7)
 end
@@ -74,7 +74,7 @@ function create_player()
 
 		if (btnp(0))  -- Move left
 		then
-			debug = 1
+			debug = "moving left"
 			self.flip = true
 
 			-- Check for collision between the player and the 'box'
@@ -83,10 +83,10 @@ function create_player()
 			-- If a box exists at the next player position
 			if (is_box(newx, self.ypos))
 			then
-				debug = 2
+				debug = "box found"
 				-- box exists, move box
-				boxtomove = get_box()
-				boxtomove:move(0, self.movement_speed)
+				-- boxtomove = get_box()
+				-- boxtomove.move(0, self.movement_speed)
 				self.xpos = newx
 
 
@@ -94,12 +94,13 @@ function create_player()
 			-- Move the player that way
 			elseif not is_collidable(newx, self.ypos)
 			then
-				debug = 4
+				-- debug = "collided left"
 				self.xpos = newx
 			end
 		end
 		if (btnp(1)) -- move right
 		then
+			debug = "moving right"
 			self.flip = false
 
 			-- Check for collision between the player and the 'box'
@@ -111,6 +112,7 @@ function create_player()
 		end
 		if (btnp(2)) -- move down
 		then
+			debug = "moving down"
 			-- Check for collision between the player and the 'box'
 			newy = self.ypos - self.movement_speed
 			if not is_collidable(self.xpos, newy)
@@ -120,6 +122,7 @@ function create_player()
 		end
 		if (btnp(3)) -- move up
 		then
+			debug = "moving up"
 			-- Check for collision between the player and the 'box'
 			newy = self.ypos + self.movement_speed
 			if not is_collidable(self.xpos, newy)
@@ -135,10 +138,11 @@ end
 -- Test creation of box, similar to create_player
 function create_box()
 	local new_box = {
-		xpos = 60,
-		ypos = 100,
-		sprite = 1, 
+		xpos = 0,
+		ypos = 0,
+		sprite = 3, 
 
+		-- constructor = function(self, newx, newy, )
 		-- For boxes, have this werid function thingy that will be called. Just need to pass a move direction in
 		-- when calling it.
 		moveBox = function(self, movedir, movement_speed)
@@ -149,7 +153,7 @@ function create_box()
 				self.flip = true
 
 				-- Check for collision between the player and the 'box'
-				newx = self.xpos - smovement_speed
+				newx = self.xpos - movement_speed
 				if not is_collidable(newx, self.ypos)
 				then
 					self.xpos = newx
@@ -230,7 +234,13 @@ end
 -- Not a specific box, but any box
 function is_box(xpos, ypos)
 	-- if sprite id is a box thing
-	return mget(xpos, ypos) == 3
+	-- return mget(xpos, ypos) == 3
+	if (mget(xpos, ypos) == 3)
+	then
+		debug = "box found"
+		return true
+	end
+	return false;
 end
 
 -- Loop through the box array, find the exact box in the position
@@ -242,8 +252,6 @@ function get_box(xpos, ypos)
 			return box
 		end
 	end
-
-	return false
 
 end 
 
@@ -330,7 +338,11 @@ function load_level(celx_start, cely_start, celx_end, cely_end)
 	for cely = cely_start, cely_end do
 		for celx = celx_start, cely_end do
 			if is_box(celx, cely) then
+				create_box()
+				boxes[swag].xpos = celx
+				boxes[swag].ypos = cely
 				swag += 1
+
 			end
 		end	
 	end
