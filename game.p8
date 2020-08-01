@@ -6,6 +6,7 @@ __lua__
 --------------------------------------
 
 -- Main pico functions
+swag = 0
 function _init()
 	-- make pico 64x64
 	poke(0x5f2c,3)
@@ -34,6 +35,8 @@ function _draw()
 	camera()
 
 	draw_entity_outline(player, 0)
+
+	print(swag)
 end
 
 -->8
@@ -239,8 +242,8 @@ function load_level(celx_start, cely_start, celx_end, cely_end)
 		cely = cely_start,
 		sx = 0,
 		sy = 0,
-		celw = celx_end - celx_start,
-		celh = cely_end - cely_start
+		celw = celx_end - celx_start + 1,
+		celh = cely_end - cely_start + 1
 		-- maybe palette stuff
 	}
 
@@ -249,7 +252,7 @@ function load_level(celx_start, cely_start, celx_end, cely_end)
 	for cely = cely_start, cely_end do
 		for celx = celx_start, cely_end do
 			if is_box(celx, cely) then
-			
+				swag += 1
 			end
 		end	
 	end
