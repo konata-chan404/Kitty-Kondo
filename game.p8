@@ -5,6 +5,8 @@ __lua__
 -- Tab 0
 --------------------------------------
 
+debug = 0
+
 -- Main pico functions
 swag = 0
 function _init()
@@ -37,6 +39,7 @@ function _draw()
 	draw_entity_outline(player, 0)
 
 	print(swag)
+	print(debug)
 end
 
 -->8
@@ -71,6 +74,7 @@ function create_player()
 
 		if (btnp(0))  -- Move left
 		then
+			debug = 1
 			self.flip = true
 
 			-- Check for collision between the player and the 'box'
@@ -79,15 +83,18 @@ function create_player()
 			-- If a box exists at the next player position
 			if (is_box(newx, self.ypos))
 			then
+				debug = 2
 				-- box exists, move box
 				boxtomove = get_box()
 				boxtomove:move(0, self.movement_speed)
 				self.xpos = newx
 
+
 			-- if the next position in the graph does not have anything collidable
 			-- Move the player that way
 			elseif not is_collidable(newx, self.ypos)
 			then
+				debug = 4
 				self.xpos = newx
 			end
 		end
