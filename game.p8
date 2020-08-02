@@ -8,7 +8,6 @@ __lua__
 debug = 0
 
 -- Main pico functions
-swag = 0
 function _init()
 	-- make pico 64x64
 	poke(0x5f2c,3)
@@ -53,15 +52,15 @@ end
 -- For creating the player!
 function create_player()
 	player = {
-	movement_speed = 8,	-- How fast the player moves
+	movement_speed = 1,	-- How fast the player moves
 
 	-- NOTE: The way this is written at the moment, this means the position of the player is anchored
 	-- to it's top left corner, rat	her than it's center. SO it's center point will need to be calculated separately
 	-- If you want it. Honestly keep it top left anchored, i dont wana anymore
 
 	-- we would probably make some sort of a player spawnpoint tile and in the load_level function we would get it's position
-	xpos = 0,
-	ypos = 0,
+	xpos = 1,
+	ypos = 1,
 	width = 8,		-- Width of player
 	height = 8,		-- Height of player
 	sprite = 0,
@@ -85,8 +84,8 @@ function create_player()
 			then
 				debug = "box found"
 				-- box exists, move box
-				-- boxtomove = get_box()
-				-- boxtomove.move(0, self.movement_speed)
+				boxtomove = get_box(newx, self.ypos)
+				boxtomove:push(0, self.movement_speed)
 				self.xpos = newx
 
 
@@ -136,16 +135,17 @@ function create_player()
 end
 
 -- Test creation of box, similar to create_player
-function create_box()
+function create_box(new_xpos, new_ypos)
 	local new_box = {
-		xpos = 0,
-		ypos = 0,
+		xpos = new_xpos,
+		ypos = new_ypos,
 		sprite = 3, 
+		current_tile = mget(new_xpos+1, new_ypos),
 
 		-- constructor = function(self, newx, newy, )
 		-- For boxes, have this werid function thingy that will be called. Just need to pass a move direction in
 		-- when calling it.
-		moveBox = function(self, movedir, movement_speed)
+		push = function(self, movedir, movement_speed)
 			local newx, newy
 
 			if (movedir == 0)  -- Move left
@@ -156,6 +156,7 @@ function create_box()
 				newx = self.xpos - movement_speed
 				if not is_collidable(newx, self.ypos)
 				then
+					self:draw(self.xpos, self.ypos, newx, self.ypos)
 					self.xpos = newx
 				end
 			end
@@ -188,6 +189,12 @@ function create_box()
 					self.ypos = newy
 				end
 			end
+		end,
+
+		draw = function(self, old_xpos, old_ypos, new_xpos, new_ypos)
+			mset(old_xpos, old_ypos, self.current_tile)
+			self.current_tile = mget(new_xpos, new_ypos)
+			mset(new_xpos, new_ypos, self.sprite)
 		end
 		}
 	add(boxes, new_box)
@@ -227,7 +234,7 @@ end
 
 -- returns if the sprite in the xpos and ypos has the collide flag
 function is_collidable(xpos, ypos)
-	return fget(mget(xpos/8, ypos/8), 0)
+	return fget(mget(xpos, ypos), 0)
 end
 
 -- Returns if box exists at position.
@@ -274,7 +281,7 @@ function draw_entity(entity, w, h, flip_x, flip_y)
 	flip_x = flip_x or false
 	flip_y = flip_y or false
 	
-	spr(entity.sprite, entity.xpos, entity.ypos, w, h, entity.flip, flip_y)
+	spr(entity.sprite, entity.xpos*8, entity.ypos*8, w, h, entity.flip, flip_y)
 end
 
 
@@ -282,6 +289,11 @@ end
 -- its 4am im not going to write comments lol
 
 function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
+	-- default values
+	w = w or 1
+	h = h or 1
+	flip_x = flip_x or false
+	flip_y = flip_y or false
 
   -- makes all colors black
   for c=1,15 do
@@ -295,9 +307,7 @@ function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
   for dy=-1,0 do
   	for dx=-1,1 do
   		if abs(dy) - abs(dx) ~= 0 then
-				entity.xpos = og_xpos + dx
-				entity.ypos = og_ypos + dy
-				draw_entity(entity, w, h, flip_x, flip_y)
+			spr(entity.sprite, entity.xpos*8+dx, entity.ypos*8+dy, w, h, entity.flip, flip_y)
   		end
   	end
   end
@@ -338,11 +348,7 @@ function load_level(celx_start, cely_start, celx_end, cely_end)
 	for cely = cely_start, cely_end do
 		for celx = celx_start, cely_end do
 			if is_box(celx, cely) then
-				create_box()
-				boxes[swag].xpos = celx
-				boxes[swag].ypos = cely
-				swag += 1
-
+				create_box(celx, cely)
 			end
 		end	
 	end
@@ -362,9 +368,9 @@ __gff__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0403040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0404040404030404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0404030404030404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0404040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0403040404040404000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
