@@ -5,39 +5,36 @@ __lua__
 -- Tab 0
 --------------------------------------
 
+-- first thing we do is make the debugging variable and make pico8 64x64
 debug = 0
+poke(0x5f2c,3)
 
 -- Main pico functions
 function _init()
-	-- make pico 64x64
-	poke(0x5f2c,3)
-
+	-- create and load all objects
 	create_game_stuff()
 	create_player()
-	-- create_box()
 
 	load_level(0, 0, 7, 7)
 end
 
 function _update()
+	-- update player position
 	player:move()
 end 
 
 function _draw()
-	-- Draw simple background
+	-- clean screen
 	cls()
-	-- draw player circle for now
-	draw_entity_outline(player, 0)
 
-	-- Draw a wall to test collisions
-	-- //draw_entity(box)
-
+	-- draw current map (including box objects)
 	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
 	camera()
 
+	-- draw main character
 	draw_entity_outline(player, 0)
 
-	print(swag)
+	-- draw debugging value
 	print(debug)
 end
 
@@ -52,20 +49,14 @@ end
 -- For creating the player!
 function create_player()
 	player = {
-	movement_speed = 1,	-- How fast the player moves
+	movement_speed = 1,	-- how fast the player moves
 
-	-- NOTE: The way this is written at the moment, this means the position of the player is anchored
-	-- to it's top left corner, rat	her than it's center. SO it's center point will need to be calculated separately
-	-- If you want it. Honestly keep it top left anchored, i dont wana anymore
+	xpos = 1, -- postion on the x axis (in grid columns!!)
+	ypos = 1, -- postion on the y axis (in grid columns!!)
 
-	-- we would probably make some sort of a player spawnpoint tile and in the load_level function we would get it's position
-	xpos = 1,
-	ypos = 1,
-	width = 8,		-- Width of player
-	height = 8,		-- Height of player
-	sprite = 0,
+	sprite = 0, -- sprite of the player (can be changed for animations!)
 	
-	flip = false,
+	flip = false, -- which way the player is facing (on the x axis)
 	
 	-- Player movement
 	move = function(self)
@@ -74,129 +65,186 @@ function create_player()
 		if (btnp(0))  -- Move left
 		then
 			debug = "moving left"
-			self.flip = true
+			self.flip = true -- player now facing opposite direction of the it's sprite
 
-			-- Check for collision between the player and the 'box'
+			-- calculate new position
 			newx = self.xpos - self.movement_speed
 
-			-- If a box exists at the next player position
+			-- if a box exists at the new player position
 			if (is_box(newx, self.ypos))
 			then
 				debug = "box found"
-				-- box exists, move box
+				-- get box object and move it
 				boxtomove = get_box(newx, self.ypos)
-				boxtomove:push(0, self.movement_speed)
-				self.xpos = newx
-
-
-			-- if the next position in the graph does not have anything collidable
-			-- Move the player that way
-			elseif not is_collidable(newx, self.ypos)
-			then
-				-- debug = "collided left"
-				self.xpos = newx
+				boxtomove:push(0, self.movement_speed) 
 			end
-		end
-		if (btnp(1)) -- move right
-		then
-			debug = "moving right"
-			self.flip = false
 
-			-- Check for collision between the player and the 'box'
-			newx = self.xpos + self.movement_speed
+			-- if the next position in the grid doesnt have anything collidable 
+			-- move the player that way
 			if not is_collidable(newx, self.ypos)
 			then
 				self.xpos = newx
 			end
 		end
+
+		if (btnp(1)) -- move right
+		then
+			debug = "moving right"
+			self.flip = false -- player now facing the direction of it's sprite
+
+			-- calculate new position
+			newx = self.xpos + self.movement_speed
+
+			-- if a box exists at the new player position
+			if (is_box(newx, self.ypos))
+			then
+				debug = "box found"
+				-- get box object and move it
+				boxtomove = get_box(newx, self.ypos)
+				boxtomove:push(1, self.movement_speed)
+			end
+
+			-- if the next position in the grid doesnt have anything collidable 
+			-- move the player that way
+			if not is_collidable(newx, self.ypos)
+			then
+				self.xpos = newx
+			end
+		end
+
 		if (btnp(2)) -- move down
 		then
 			debug = "moving down"
-			-- Check for collision between the player and the 'box'
+
+			-- calculate new position
 			newy = self.ypos - self.movement_speed
+
+			-- if a box exists at the new player position
+			if (is_box(self.xpos, newy))
+			then
+				debug = "box found"
+				-- get box object and move it
+				boxtomove = get_box(self.xpos, newy)
+				boxtomove:push(2, self.movement_speed)
+			end
+
+			-- if the next position in the grid doesnt have anything collidable 
+			-- move the player that way
 			if not is_collidable(self.xpos, newy)
 			then
 				self.ypos = newy
 			end
 		end
+
 		if (btnp(3)) -- move up
 		then
 			debug = "moving up"
-			-- Check for collision between the player and the 'box'
+
+			-- calculate new position
 			newy = self.ypos + self.movement_speed
+
+			-- if a box exists at the new player position
+			if (is_box(self.xpos, newy))
+			then
+				debug = "box found"
+				-- get box object and move it
+				boxtomove = get_box(self.xpos, newy)
+				boxtomove:push(3, self.movement_speed)
+			end
+
+
+			-- if the next position in the grid doesnt have anything collidable 
+			-- move the player that way
 			if not is_collidable(self.xpos, newy)
 			then
 				self.ypos = newy
 			end
 		end
 	end
-
 	}
 end
 
--- Test creation of box, similar to create_player
+-- for creating a box!!
 function create_box(new_xpos, new_ypos)
 	local new_box = {
-		xpos = new_xpos,
-		ypos = new_ypos,
-		sprite = 3, 
-		current_tile = mget(new_xpos+1, new_ypos),
+		xpos = new_xpos, -- position on the x axis (passed in the "constructor")
+		ypos = new_ypos, -- position on the y axis (passed in the "constructor")
+		sprite = 3, -- sprite of the box (will be changed for different types of boxes)
 
-		-- constructor = function(self, newx, newy, )
-		-- For boxes, have this werid function thingy that will be called. Just need to pass a move direction in
-		-- when calling it.
+		current_tile = mget(new_xpos+1, new_ypos), -- estimate the tile that the box sits on (very hacky!!)
+
+		-- push function: moves the box in the movedir direction
+		-- gets called when player moves into a box
+
 		push = function(self, movedir, movement_speed)
 			local newx, newy
 
-			if (movedir == 0)  -- Move left
+			if (movedir == 0)  -- move left
 			then
-				self.flip = true
-
-				-- Check for collision between the player and the 'box'
+				-- calculate new position
 				newx = self.xpos - movement_speed
+
+				-- if the next position in the grid doesnt have anything collidable 
+				-- move the box that way
+				if not is_collidable(newx, self.ypos)
+				then
+					self:draw(self.xpos, self.ypos, newx, self.ypos)
+					self.xpos = newx
+				 end
+			end
+			
+			if (movedir == 1) -- move right
+			then
+				-- calculate new position
+				newx = self.xpos + movement_speed
+
+				-- if the next position in the grid doesnt have anything collidable 
+				-- move the box that way
 				if not is_collidable(newx, self.ypos)
 				then
 					self:draw(self.xpos, self.ypos, newx, self.ypos)
 					self.xpos = newx
 				end
 			end
-			if (movedir == 1) -- move right
-			then
-				self.flip = false
 
-				-- Check for collision between the player and the 'box'
-				newx = self.xpos + movement_speed
-				if not is_collidable(newx, self.ypos)
-				then
-					self.xpos = newx
-				end
-			end
 			if (movedir == 2) -- move down
 			then
-				-- Check for collision between the player and the 'box'
+				-- calculate new position
 				newy = self.ypos - movement_speed
+
+				-- if the next position in the grid doesnt have anything collidable 
+				-- move the box that way
 				if not is_collidable(self.xpos, newy)
 				then
+					self:draw(self.xpos, self.ypos, self.xpos, newy)
 					self.ypos = newy
 				end
 			end
+
 			if (movedir == 3) -- move up
 			then
-				-- Check for collision between the player and the 'box'
+				-- calculate new position
 				newy = self.ypos + movement_speed
+
+				-- if the next position in the grid doesnt have anything collidable 
+				-- move the box that way
 				if not is_collidable(self.xpos, newy)
 				then
+					self:draw(self.xpos, self.ypos, self.xpos, newy)
 					self.ypos = newy
 				end
 			end
 		end,
 
+		-- updates the box position on the map
 		draw = function(self, old_xpos, old_ypos, new_xpos, new_ypos)
 			mset(old_xpos, old_ypos, self.current_tile)
 			self.current_tile = mget(new_xpos, new_ypos)
 			mset(new_xpos, new_ypos, self.sprite)
 		end
 		}
+	
+	-- adds the new box to the array of boxes
 	add(boxes, new_box)
 end
 
@@ -237,20 +285,13 @@ function is_collidable(xpos, ypos)
 	return fget(mget(xpos, ypos), 0)
 end
 
--- Returns if box exists at position.
--- Not a specific box, but any box
+-- returns if box exists at position.
+-- not a specific box, but any box
 function is_box(xpos, ypos)
-	-- if sprite id is a box thing
-	-- return mget(xpos, ypos) == 3
-	if (mget(xpos, ypos) == 3)
-	then
-		debug = "box found"
-		return true
-	end
-	return false;
+	return mget(xpos, ypos) == 3
 end
 
--- Loop through the box array, find the exact box in the position
+-- loop through the box array, find the exact box in the position
 function get_box(xpos, ypos)
 	for box in all(boxes)
 	do
@@ -285,9 +326,7 @@ function draw_entity(entity, w, h, flip_x, flip_y)
 end
 
 
--- draw_entity with outline
--- its 4am im not going to write comments lol
-
+-- draw_entity with an outline of the col_outline color
 function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
 	-- default values
 	w = w or 1
@@ -323,15 +362,15 @@ function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
  	draw_entity(entity, w, h, flip_x, flip_y)
 end
 
+-- creates game related stuff (box array, level harcoding...)
 function create_game_stuff()
 	boxes = {}
 	levels = {}
 	current_level = {}
 end
 
-
+-- loads game objects and level stuff from the coordinates given to the function
 function load_level(celx_start, cely_start, celx_end, cely_end)
-	local current_sprite
 
 	current_level = {
 		celx = celx_start,
@@ -340,10 +379,7 @@ function load_level(celx_start, cely_start, celx_end, cely_end)
 		sy = 0,
 		celw = celx_end - celx_start + 1,
 		celh = cely_end - cely_start + 1
-		-- maybe palette stuff
 	}
-
-	-- maybe palette changing stuff here
 
 	for cely = cely_start, cely_end do
 		for celx = celx_start, cely_end do
