@@ -14,6 +14,7 @@ function _init()
 	-- create and load all objects
 	create_game_stuff()
 	create_player()
+	camera(player.xpos, player.ypos)
 
 	load_level(levels[1], true)
 end
@@ -36,7 +37,7 @@ function _draw()
 
 	-- draw current map (including box objects)
 	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
-	camera(cam.xpos, cam.ypos)
+	camera(cam.xpos + 16, cam.ypos + 16)
 
 	-- draw main character
 	draw_entity_outline(player)
@@ -107,6 +108,8 @@ function create_player()
 					self.xpos = newx
 				end
 			end
+
+			cam.xpos -= newx
 		end
 
 		if (btnp(1)) -- move right
@@ -143,6 +146,7 @@ function create_player()
 					self.xpos = newx
 				end
 			end
+			cam.xpos += newx
 		end
 
 		if (btnp(2)) -- move down
@@ -177,6 +181,8 @@ function create_player()
 					self.ypos = newy
 				end
 			end
+
+			cam.ypos -= newy
 		end
 
 		if (btnp(3)) -- move up
@@ -211,6 +217,7 @@ function create_player()
 					self.ypos = newy
 				end
 			end
+			cam.ypos += newy
 		end
 	end
 	}
