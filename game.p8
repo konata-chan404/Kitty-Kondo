@@ -37,7 +37,7 @@ function _draw()
 
 	-- draw current map (including box objects)
 	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
-	camera(cam.xpos*4, cam.ypos*4)
+	camera()
 
 	-- draw main character
 	draw_entity_outline(player)
@@ -476,7 +476,7 @@ function create_game_stuff()
 			celx_start = 10,
 			cely_start = 0,
 			celx_end = 18,
-			cely_end = 8,
+			cely_end = 7,
 			player_spawn = {xpos=17, ypos=6},
 			end_point = {xpos=22, ypos = 4},
 			ground_tile = 4
@@ -486,7 +486,7 @@ function create_game_stuff()
 		{
 			celx_start = 20,
 			cely_start = 0,
-			celx_end = 28,
+			celx_end = 27,
 			cely_end = 8,
 			player_spawn = {xpos=25, ypos=3},
 			end_point = {xpos=22, ypos = 4},
@@ -497,8 +497,8 @@ function create_game_stuff()
 		{
 			celx_start = 0,
 			cely_start = 0,
-			celx_end = 9,
-			cely_end = 9,
+			celx_end = 7,
+			cely_end = 7,
 			player_spawn = {xpos=4, ypos=1},
 			end_point = {xpos=6, ypos = 6},
 			ground_tile = 4
@@ -526,8 +526,8 @@ function load_level(level, next_level)
 		cely = level.cely_start,
 		sx = 0,
 		sy = 0,
-		celw = level.celx_end - level.celx_start,
-		celh = level.cely_end - level.cely_start,
+		celw = level.celx_end - level.celx_start + 1,
+		celh = level.cely_end - level.cely_start + 1,
 		end_point = level.end_point,
 		ground_tile = level.ground_tile
 	}
