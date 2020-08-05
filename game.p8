@@ -37,7 +37,7 @@ function _draw()
 
 	-- draw current map (including box objects)
 	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
-	camera(cam.xpos + 16, cam.ypos + 16)
+	camera(cam.xpos*4, cam.ypos*4)
 
 	-- draw main character
 	draw_entity_outline(player)
@@ -106,10 +106,10 @@ function create_player()
 					
 				else
 					self.xpos = newx
+					cam.xpos -= self.movement_speed
 				end
 			end
 
-			cam.xpos -= newx
 		end
 
 		if (btnp(1)) -- move right
@@ -144,9 +144,9 @@ function create_player()
 
 				else
 					self.xpos = newx
+					cam.xpos += self.movement_speed
 				end
 			end
-			cam.xpos += newx
 		end
 
 		if (btnp(2)) -- move down
@@ -179,10 +179,9 @@ function create_player()
 
 				else
 					self.ypos = newy
+					cam.ypos -= self.movement_speed
 				end
 			end
-
-			cam.ypos -= newy
 		end
 
 		if (btnp(3)) -- move up
@@ -215,9 +214,9 @@ function create_player()
 
 				else
 					self.ypos = newy
+					cam.ypos += self.movement_speed
 				end
 			end
-			cam.ypos += newy
 		end
 	end
 	}
@@ -457,6 +456,10 @@ end
 function create_game_stuff()
 	boxes = {}
 	block_points = {}
+	cam = {
+		xpos = 0,
+		ypos = 0
+	}
 	is_sokoban = false
 
 	-- example_level = {
