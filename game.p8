@@ -14,7 +14,8 @@ function _init()
 	-- create and load all objects
 	create_game_stuff()
 	create_player()
-	camera(player.xpos, player.ypos)
+	-- camera(player.xpos, player.ypos) - this line is pointless. were updating the camera position every frame anyway so whats the point?
+
 
 	load_level(levels[1], true)
 end
@@ -229,8 +230,29 @@ function create_player()
 		local new_cam_xpos = flr(current_level.celw/2) + (current_level.celx - self.xpos)
 		local new_cam_ypos = flr(current_level.celh/2) + (current_level.cely - self.ypos)
 		-- dont worry its ternery lol
-		cam.xpos = (current_level.celx - self.xpos < current_level.celw/2) and -new_cam_xpos or 0
-		cam.ypos = (current_level.cely - self.ypos < current_level.celh/2) and -new_cam_ypos or 0
+		
+
+		-- If map is bigger than 64x64
+		-- Horizontal
+		if (current_level.celw > 8)
+		then
+			-- Check if player is 4 ingame units away from the wall
+			if ((player.xpos - current_level.celx) > 4 and (player.xpos - current_level.celx) < current_level.celw)
+			then
+				cam.xpos = (current_level.celx - self.xpos < current_level.celw/2) and -new_cam_xpos or 0
+			end
+		end
+
+		-- vertical
+		if (current_level.celh > 8)
+		then
+			if ((player.ypos - current_level.cely) > 4 and (player.ypos - current_level.cely) < current_level.celh)
+			then
+				cam.ypos = (current_level.cely - self.ypos < current_level.celh/2) and -new_cam_ypos or 0
+			end
+		end
+
+		
 	end
 	}
 end
