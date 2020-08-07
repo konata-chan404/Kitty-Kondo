@@ -237,7 +237,7 @@ function create_player()
 		if (current_level.celw > 8)
 		then
 			-- Check if player is 4 ingame units away from the wall
-			if ((player.xpos - current_level.celx) > 4 and (player.xpos - current_level.celx) < current_level.celw)
+			if ((player.xpos - current_level.celx) > 4 and (player.xpos - current_level.celx) < current_level.celw - 2)
 			then
 				cam.xpos = (current_level.celx - self.xpos < current_level.celw/2) and -new_cam_xpos or 0
 			end
@@ -246,13 +246,16 @@ function create_player()
 		-- vertical
 		if (current_level.celh > 8)
 		then
-			if ((player.ypos - current_level.cely) > 4 and (player.ypos - current_level.cely) < current_level.celh)
+			if ((player.ypos - current_level.cely) > 4 and (player.ypos - current_level.cely) < current_level.celh - 2)
 			then
 				cam.ypos = (current_level.cely - self.ypos < current_level.celh/2) and -new_cam_ypos or 0
+				-- cam.ypos -= 1
 			end
 		end
 
-		
+
+		-- cam.xpos = (current_level.celx - self.xpos < current_level.celw/2) and -new_cam_xpos or 0
+		-- cam.ypos = (current_level.cely - self.ypos < current_level.celh/2) and -new_cam_ypos or 0
 	end
 	}
 end
@@ -508,10 +511,10 @@ function create_game_stuff()
 	levels = {
 		-- first level
 		{
-			celx_start = 9,
+			celx_start = 8,
 			cely_start = 0,
 			celx_end = 18,
-			cely_end = 8,
+			cely_end = 9,
 			player_spawn = {xpos=17, ypos=6},
 			end_point = {xpos=22, ypos = 4},
 			ground_tile = 4
