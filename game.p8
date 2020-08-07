@@ -237,7 +237,7 @@ function create_player()
 		if (current_level.celw > 8)
 		then
 			-- Check if player is 4 ingame units away from the wall
-			if (player.xpos - current_level.celx) > 4 and (current_level.celx - self.xpos < current_level.celw/2)
+			if (player.xpos - current_level.celx) > 4 and (self.xpos - current_level.celx < current_level.celw-2)
 			then
 				cam.xpos = -new_cam_xpos
 			end
@@ -249,7 +249,7 @@ function create_player()
 		-- vertical
 		if (current_level.celh > 8)
 		then
-			if (player.ypos - current_level.cely) > 4 and (current_level.cely - self.ypos < current_level.celh/2)
+			if (player.ypos - current_level.cely) > 4 and (player.ypos - current_level.cely < current_level.celh-2)
 			then
 				cam.ypos = -new_cam_ypos
 				-- cam.ypos -= 1
