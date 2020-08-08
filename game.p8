@@ -37,14 +37,16 @@ function _draw()
 	cls()
 
 	-- draw current map (including box objects)
-	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
 	camera(cam.xpos*8, cam.ypos*8)
+	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
 
 	-- draw main character
 	draw_entity_outline(player)
 
+
 	-- draw debugging values
-    --print(current_level.index)
+    camera()
+	--print(current_level.index)
     --print(player.xpos)
     --print(player.ypos)
 	--print(#boxes)
@@ -229,18 +231,18 @@ function create_player()
 	update_camera = function(self)
 		local new_cam_xpos = flr(current_level.celw/2) + (current_level.celx - self.xpos)
 		local new_cam_ypos = flr(current_level.celh/2) + (current_level.cely - self.ypos)
-		-- dont worry its ternery lol
 		
 
 		-- If map is bigger than 64x64
 		-- Horizontal
 		if (current_level.celw > 8)
 		then
-			-- Check if player is 4 ingame units away from the wall
-			if (player.xpos - current_level.celx) > 4 and (self.xpos - current_level.celx < current_level.celw-2)
+			if (self.xpos - current_level.celx) > flr(current_level.celw/2)-1 and (self.xpos - current_level.celx < current_level.celw-2)
 			then
 				cam.xpos = -new_cam_xpos
+				-- cam.ypos -= 1
 			end
+
 		-- smaller than 64x64		
 		else
 			cam.xpos = 0
@@ -249,7 +251,7 @@ function create_player()
 		-- vertical
 		if (current_level.celh > 8)
 		then
-			if (player.ypos - current_level.cely) > 4 and (player.ypos - current_level.cely < current_level.celh-2)
+			if (self.ypos - current_level.cely) > flr(current_level.celh/2)-1 and (self.ypos - current_level.cely < current_level.celh-2)
 			then
 				cam.ypos = -new_cam_ypos
 				-- cam.ypos -= 1
@@ -259,9 +261,6 @@ function create_player()
 			cam.ypos = 0
 		end
 
-
-		-- cam.xpos = (current_level.celx - self.xpos < current_level.celw/2) and -new_cam_xpos or 0
-		-- cam.ypos = (current_level.cely - self.ypos < current_level.celh/2) and -new_cam_ypos or 0
 	end
 	}
 end
@@ -529,11 +528,11 @@ function create_game_stuff()
 		--second level
 		{
 			celx_start = 0,
-			cely_start = 11,
-			celx_end = 14,
-			cely_end = 21,
-			player_spawn = {xpos=2, ypos=13},
-			end_point = {xpos=22, ypos = 4},
+			cely_start = 0,
+			celx_end = 7,
+			cely_end = 7,
+			player_spawn = {xpos=4, ypos=1},
+			end_point = {xpos=6, ypos = 6},
 			ground_tile = 4
 		},
 
@@ -552,11 +551,11 @@ function create_game_stuff()
 		-- fourth level
 		{
 			celx_start = 0,
-			cely_start = 0,
-			celx_end = 7,
-			cely_end = 7,
-			player_spawn = {xpos=4, ypos=1},
-			end_point = {xpos=6, ypos = 6},
+			cely_start = 11,
+			celx_end = 14,
+			cely_end = 21,
+			player_spawn = {xpos=2, ypos=13},
+			end_point = {xpos=22, ypos = 4},
 			ground_tile = 4
 		}
 	}
