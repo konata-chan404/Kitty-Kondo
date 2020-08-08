@@ -229,37 +229,39 @@ function create_player()
 	end,
 
 	update_camera = function(self)
-		local new_cam_xpos = flr(current_level.celw/2) + (current_level.celx - self.xpos)
-		local new_cam_ypos = flr(current_level.celh/2) + (current_level.cely - self.ypos)
+        local new_cam_xpos = mid(0, player.xpos - current_level.celx - 4, current_level.celw/2 - current_level.cel_cam_offset_X)
+        local new_cam_ypos = mid(0, player.ypos - current_level.cely - 4, current_level.celh/2 - current_level.cel_cam_offset_Y)
+		cam.xpos = new_cam_xpos 
+		cam.ypos = new_cam_ypos 
 		
 
-		-- If map is bigger than 64x64
-		-- Horizontal
-		if (current_level.celw > 8)
-		then
-			if (self.xpos - current_level.celx) > flr(current_level.celw/2)-1 and (self.xpos - current_level.celx < current_level.celw-2)
-			then
-				cam.xpos = -new_cam_xpos
-				-- cam.ypos -= 1
-			end
+		-- -- If map is bigger than 64x64
+		-- -- Horizontal
+		-- if (current_level.celw > 8)
+		-- then
+		-- 	if (self.xpos - current_level.celx) > flr(current_level.celw/2)-1 and (self.xpos - current_level.celx < current_level.celw-2)
+		-- 	then
+		-- 		cam.xpos = -new_cam_xpos
+		-- 		-- cam.ypos -= 1
+		-- 	end
 
-		-- smaller than 64x64		
-		else
-			cam.xpos = 0
-		end
+		-- -- smaller than 64x64		
+		-- else
+		-- 	cam.xpos = 0
+		-- end
 
-		-- vertical
-		if (current_level.celh > 8)
-		then
-			if (self.ypos - current_level.cely) > flr(current_level.celh/2)-1 and (self.ypos - current_level.cely < current_level.celh-2)
-			then
-				cam.ypos = -new_cam_ypos
-				-- cam.ypos -= 1
-			end
+		-- -- vertical
+		-- if (current_level.celh > 8)
+		-- then
+		-- 	if (self.ypos - current_level.cely) > flr(current_level.celh/2)-1 and (self.ypos - current_level.cely < current_level.celh-2)
+		-- 	then
+		-- 		cam.ypos = -new_cam_ypos
+		-- 		-- cam.ypos -= 1
+		-- 	end
 		
-		else
-			cam.ypos = 0
-		end
+		-- else
+		-- 	cam.ypos = 0
+		-- end
 
 	end
 	}
@@ -522,7 +524,9 @@ function create_game_stuff()
 			cely_end = 9,
 			player_spawn = {xpos=17, ypos=6},
 			end_point = {xpos=22, ypos = 4},
-			ground_tile = 4
+			ground_tile = 4,
+			cel_cam_offset_X = 2,
+			cel_cam_offset_Y = 3
 		},
 
 		--second level
@@ -533,7 +537,9 @@ function create_game_stuff()
 			cely_end = 7,
 			player_spawn = {xpos=4, ypos=1},
 			end_point = {xpos=6, ypos = 6},
-			ground_tile = 4
+			ground_tile = 4,
+			cel_cam_offset_X = 4,
+			cel_cam_offset_Y = 4
 		},
 
 		--third level
@@ -544,7 +550,9 @@ function create_game_stuff()
 			cely_end = 7,
 			player_spawn = {xpos=25, ypos=3},
 			end_point = {xpos=22, ypos = 4},
-			ground_tile = 4
+			ground_tile = 4,
+			cel_cam_offset_X = 4,
+			cel_cam_offset_Y = 4
 		},
 
 
@@ -556,7 +564,9 @@ function create_game_stuff()
 			cely_end = 21,
 			player_spawn = {xpos=2, ypos=13},
 			end_point = {xpos=22, ypos = 4},
-			ground_tile = 4
+			ground_tile = 4,
+			cel_cam_offset_X = 1,
+			cel_cam_offset_Y = 3
 		}
 	}
 
@@ -584,7 +594,9 @@ function load_level(level, next_level)
 		celw = level.celx_end - level.celx_start + 1,
 		celh = level.cely_end - level.cely_start + 1,
 		end_point = level.end_point,
-		ground_tile = level.ground_tile
+		ground_tile = level.ground_tile,
+		cel_cam_offset_X = level.cel_cam_offset_X,
+		cel_cam_offset_Y = level.cel_cam_offset_Y
 	}
 	
 	boxes = {}
