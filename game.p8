@@ -228,38 +228,40 @@ function create_player()
 		end
 	end,
 
-	update_camera = function(self)
-		local new_cam_xpos = flr(current_level.celw/2) + (current_level.celx - self.xpos)
-		local new_cam_ypos = flr(current_level.celh/2) + (current_level.cely - self.ypos)
+    update_camera = function(self)
+        local new_cam_xpos = mid(0, player.xpos - current_level.celx - 4, current_level.celw/2 -4)
+        local new_cam_ypos = mid(0, player.ypos - current_level.cely - 4, current_level.celh/2 -4)
+        
+        cam.xpos = new_cam_xpos
+        cam.ypos = new_cam_ypos
+
+		-- -- If map is bigger than 64x64
+		-- -- Horizontal
+		-- if (current_level.celw > 8)
+		-- then
+		-- 	if (self.xpos - current_level.celx) > flr(current_level.celw/2)-1 and (self.xpos - current_level.celx < current_level.celw-2)
+		-- 	then
+		-- 		cam.xpos = -new_cam_xpos
+		-- 		-- cam.ypos -= 1
+		-- 	end
+
+		-- -- smaller than 64x64		
+		-- else
+		-- 	cam.xpos = 0
+		-- end
+
+		-- -- vertical
+		-- if (current_level.celh > 8)
+		-- then
+		-- 	if (self.ypos - current_level.cely) > flr(current_level.celh/2)-1 and (self.ypos - current_level.cely < current_level.celh-2)
+		-- 	then
+		-- 		cam.ypos = -new_cam_ypos
+		-- 		-- cam.ypos -= 1
+		-- 	end
 		
-
-		-- If map is bigger than 64x64
-		-- Horizontal
-		if (current_level.celw > 8)
-		then
-			if (self.xpos - current_level.celx) > flr(current_level.celw/2)-1 and (self.xpos - current_level.celx < current_level.celw-2)
-			then
-				cam.xpos = -new_cam_xpos
-				-- cam.ypos -= 1
-			end
-
-		-- smaller than 64x64		
-		else
-			cam.xpos = 0
-		end
-
-		-- vertical
-		if (current_level.celh > 8)
-		then
-			if (self.ypos - current_level.cely) > flr(current_level.celh/2)-1 and (self.ypos - current_level.cely < current_level.celh-2)
-			then
-				cam.ypos = -new_cam_ypos
-				-- cam.ypos -= 1
-			end
-		
-		else
-			cam.ypos = 0
-		end
+		-- else
+		-- 	cam.ypos = 0
+		-- end
 
 	end
 	}
