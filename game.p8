@@ -5,12 +5,37 @@ __lua__
 -- Tab 0
 --------------------------------------
 
--- first thing we do is make the debugging variable and make pico8 64x64
-debug = 0
-poke(0x5f2c,3)
 
--- Main pico functions
 function _init()
+	debug = 0
+	poke(0x5f2c,3)
+	menu_init()
+end
+
+-- menu functions
+function menu_init() 
+	_update = menu_update
+	_draw = menu_draw
+end
+
+function menu_update()
+	if btnp(4) then
+		load_game()
+	end
+end
+
+function menu_draw()
+	cls()
+end
+
+-- main game functions
+function load_game()
+	game_init()
+	_update = game_update
+	_draw = game_draw
+end
+
+function game_init()
 	-- create and load all objects
 	create_game_stuff()
 	create_player()
@@ -20,7 +45,7 @@ function _init()
 	load_level(levels[1], true)
 end
 
-function _update()
+function game_update()
 	-- update player position
 	player:move()
 	if btnp(5) then
@@ -32,7 +57,7 @@ function _update()
 	end
 end 
 
-function _draw()
+function game_draw()
 	-- clean screen
 	cls()
 
