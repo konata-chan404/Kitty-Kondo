@@ -25,7 +25,7 @@ function menu_update()
 end
 
 function menu_draw()
-	cls()
+	cls(1)
 end
 
 -- main game functions
@@ -66,12 +66,11 @@ function game_draw()
 	map(current_level.celx, current_level.cely, current_level.sx, current_level.sy, current_level.celw, current_level.celh)
 
 	-- draw main character
-	draw_entity_outline(player)
+	draw_entity_outline(player, 1)
 
 
 	-- draw debugging values
     camera()
-	--print(current_level.index)
     --print(player.xpos)
     --print(player.ypos)
 	--print(#boxes)
@@ -517,7 +516,7 @@ function draw_entity_outline(entity, col_outline, w, h, flip_x, flip_y)
 		  
   -- returns all of the colors
   -- might need to change that if we'll do custom palette
-  pal()
+  load_palette(current_level.palette)
   
   -- finally draws teh actual thing
  	draw_entity(entity, w, h, flip_x, flip_y)
@@ -550,7 +549,8 @@ function create_game_stuff()
 			cely_end = 9,
 			player_spawn = {xpos=17, ypos=6},
 			end_point = {xpos=22, ypos = 4},
-			ground_tile = 4
+			ground_tile = 4,
+			palette = {128,0,2,8,132,4,137,9,129,131,139,138,133,5,134,7}
 		},
 
 		--second level
@@ -603,6 +603,8 @@ end
 -- loads game objects and level stuff from the coordinates given to the function
 function load_level(level, next_level)
 
+	local last_palette = current_level.palette
+
 	current_level = {
 		index = current_level.index + (next_level and 1 or 0),
 		celx = level.celx_start,
@@ -613,8 +615,8 @@ function load_level(level, next_level)
 		celh = level.cely_end - level.cely_start + 1,
 		end_point = level.end_point,
 		ground_tile = level.ground_tile,
-
-		barrier = {}
+		barrier = {},
+		palette = last_palette
 	}
 	
 	boxes = {}
@@ -625,6 +627,11 @@ function load_level(level, next_level)
 	player.ypos = level.player_spawn.ypos
 
 	player:update_camera()
+
+	if level.palette ~= nil then
+		current_level.palette = level.palette
+		load_palette(current_level.palette)
+	end
 
 	for cely = level.cely_start, level.cely_end do
 		for celx = level.celx_start, level.celx_end do
@@ -660,6 +667,11 @@ function restart_level()
 	load_level(levels[current_level.index], false)
 end
 
+function load_palette(palette)
+	for i=1,#palette do
+		pal(i-1, palette[i])
+	end
+end
 
 __gfx__
 000900400009004000000000444444443333333355555555333333a3333333336363636300000000000000000000000000000000000000000000000000000000
