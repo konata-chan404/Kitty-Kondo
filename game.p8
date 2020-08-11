@@ -668,8 +668,9 @@ function restart_level()
 end
 
 function load_palette(palette)
+	pal()
 	for i=1,#palette do
-		pal(i-1, palette[i])
+		pal(i-1, palette[i], 1)
 	end
 end
 
