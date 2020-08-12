@@ -571,7 +571,7 @@ function create_game_stuff()
 			cely_start = 8,
 			celx_end = 7,
 			cely_end = 15,
-			player_spawn = {xpos=7, ypos=10},
+			player_spawn = {xpos=7, ypos=11},
 			end_point = {xpos=22, ypos = 4},
 			ground_tile = 62
 		},
