@@ -15,6 +15,9 @@ end
 
 -- menu functions
 function menu_init() 
+	t = 0
+	t_flash = 10
+	flash_time = 5
 	_update = menu_update
 	_draw = menu_draw
 end
@@ -26,7 +29,16 @@ function menu_update()
 end
 
 function menu_draw()
-	cls(1)
+	cls(3)
+	if t < t_flash
+	then
+		print("press z", 32-14 , 50)
+	else 
+		if t == flash_time + t_flash
+		then t = 0 end
+	end
+
+	t += 1
 end
 
 -- main game functions
