@@ -392,11 +392,17 @@ function create_block_point(new_xpos, new_ypos)
 end
 
 function open_barrier()
-	mset(current_level.barrier.xpos, current_level.barrier.ypos, current_level.ground_tile)
+	if not (current_level.barrier.open) then
+		mset(current_level.barrier.xpos, current_level.barrier.ypos, current_level.ground_tile)
+		current_level.barrier.open = true
+	end
 end
 
 function close_barrier()
-	mset(current_level.barrier.xpos, current_level.barrier.ypos, current_level.barrier.sprite)
+	if (current_level.barrier.open) then
+		mset(current_level.barrier.xpos, current_level.barrier.ypos, current_level.barrier.sprite)
+		current_level.barrier.open = false
+	end
 end
 
 -------------------------------------------------------------
@@ -722,7 +728,8 @@ function load_level(level, next_level)
 				current_level.barrier = {
 					xpos = celx,
 					ypos = cely,
-					sprite = mget(celx, cely)
+					sprite = mget(celx, cely),
+					open = false
 				}
 			end
 		end
