@@ -32,6 +32,7 @@ end
 
 function menu_draw()
 	cls(3)
+	print("kitty kondo", 32-22, 10)
 	if t < t_flash
 	then
 		print("press z", 32-14 , 50)
@@ -62,14 +63,14 @@ end
 
 function game_update()
 	-- update player position
-	player:move()
-	
-	if btnp(4) then
-		load_next_level()
-	end
+	player:move(nil)
 	
 	if btnp(5) then
 		restart_level()
+	end
+
+	if btnp(4) then
+		rewind()
 	end
 	
 end 
@@ -88,7 +89,7 @@ function game_draw()
 
 	-- draw debugging values
     camera()
-    --print(player.xpos)
+    print(#moves)
     --print(player.ypos)
 	--print(#boxes)
 	--print(#block_points)
@@ -122,13 +123,15 @@ function create_player()
 	flip = false, -- which way the player is facing (on the x axis)
 	
 	-- Player movement
-	move = function(self)
+	move = function(self, direction)
 		local newx, newy
 
-		if (btnp(0))  -- Move left
+		if (btnp(0) or direction == 0)  -- Move left
 		then
 			debug = "moving left"
-			self.flip = true -- player now facing opposite direction of the it's sprite
+			self.flip = true and not direction==nil -- player now facing opposite direction of the it's sprite
+			if direction == nil then
+			moves[#moves + 1] = {direction=0} end
 
 			-- calculate new position
 			newx = self.xpos - self.movement_speed
@@ -139,7 +142,11 @@ function create_player()
 				debug = "box found"
 				-- get box object and move it
 				boxtomove = get_box(newx, self.ypos)
-				boxtomove:push(0, self.movement_speed) 
+				boxtomove:push(0, self.movement_speed)
+
+				if direction == nil then
+				moves[#moves].box = boxtomove end
+
 				if is_sokoban and current_level.barrier.xpos != nil
 				then
 					if all_block_points_occupied() then
@@ -162,14 +169,19 @@ function create_player()
 					self.xpos = newx
 					self:update_camera()
 				end
+			else
+				if direction == nil then
+					moves[#moves] = nil end
 			end
 
 		end
 
-		if (btnp(1)) -- move right
+		if (btnp(1) or direction == 1) -- move right
 		then
 			debug = "moving right"
-			self.flip = false -- player now facing the direction of it's sprite
+			self.flip = false and not direction==nil -- player now facing the direction of it's sprite
+			if direction == nil then
+			moves[#moves + 1] = {direction=1} end
 
 			-- calculate new position
 			newx = self.xpos + self.movement_speed
@@ -181,6 +193,9 @@ function create_player()
 				-- get box object and move it
 				boxtomove = get_box(newx, self.ypos)
 				boxtomove:push(1, self.movement_speed)
+
+				if direction == nil then
+				moves[#moves].box = boxtomove end
 				
 				if is_sokoban and current_level.barrier.xpos != nil
 				then
@@ -204,12 +219,17 @@ function create_player()
 					self.xpos = newx
 					self:update_camera()
 				end
+			else
+				if direction == nil then
+					moves[#moves] = nil end
 			end
 		end
 
-		if (btnp(2)) -- move down
+		if (btnp(2) or direction == 2) -- move down
 		then
 			debug = "moving down"
+			if direction == null then
+			moves[#moves + 1] = {direction=2} end
 
 			-- calculate new position
 			newy = self.ypos - self.movement_speed
@@ -222,6 +242,9 @@ function create_player()
 				boxtomove = get_box(self.xpos, newy)
 				boxtomove:push(2, self.movement_speed)
 				
+				if direction == nil then
+				moves[#moves].box = boxtomove end
+				
 				if is_sokoban and current_level.barrier.xpos != nil
 				then
 					if all_block_points_occupied() then
@@ -243,12 +266,17 @@ function create_player()
 					self.ypos = newy
 					self:update_camera()
 				end
+			else
+				if direction == nil then
+					moves[#moves] = nil end
 			end
 		end
 
-		if (btnp(3)) -- move up
+		if (btnp(3) or direction == 3) -- move up
 		then
 			debug = "moving up"
+			if direction == nil then
+			moves[#moves + 1] = {direction=3} end
 
 			-- calculate new position
 			newy = self.ypos + self.movement_speed
@@ -260,6 +288,9 @@ function create_player()
 				-- get box object and move it
 				boxtomove = get_box(self.xpos, newy)
 				boxtomove:push(3, self.movement_speed)
+
+				if direction == nil then
+				moves[#moves].box = boxtomove end
 				
 				if is_sokoban and current_level.barrier.xpos != nil
 				then
@@ -284,6 +315,9 @@ function create_player()
 					self.ypos = newy
 					self:update_camera()
 				end
+			else
+				if direction == nil then
+					moves[#moves] = nil end
 			end
 		end
 	end,
@@ -632,7 +666,8 @@ function create_game_stuff()
 			cely_end = 44,
 			player_spawn = {xpos=17, ypos=35},
 			end_point = {xpos=100, ypos = 100},
-			ground_tile = 62
+			ground_tile = 62,
+			music = 4
 		},
 
 
@@ -768,6 +803,19 @@ function create_game_stuff()
 	
 end
 
+
+function rewind()
+	local last_move = moves[#moves]
+
+	if type(last_move) == "table" then
+		player:move(last_move.direction + (last_move.direction%2==0 and 1 or -1))
+		if type(last_move.box) == "table" then
+		last_move.box:push(last_move.direction + (last_move.direction%2==0 and 1 or -1), 1) end
+		
+		moves[#moves] = nil
+	end
+end
+
 -- loads game objects and level stuff from the coordinates given to the function
 function load_level(level, next_level)
 
@@ -789,6 +837,7 @@ function load_level(level, next_level)
 	
 	boxes = {}
 	block_points = {}
+	moves = {}
 	is_sokoban = false
 
 	player.xpos = level.player_spawn.xpos
@@ -864,14 +913,14 @@ b000000b11111111000000000000000000000000c1cccccccccccc1d1eeeeee11eeeeee11eeeeee1
 000bb00015455451000000000000000000000000d1eeeeeeeeeeee1e1eeeeee1eeeeeee1eeeeeeee1eeeeeee1eeeeee1cccccccc1eeeeee1cccccccc1eeeeee1
 0b0000b015055051000000000000000000000000d1cccccccccccc1e1eeeeee1ceeeeee1ceeeeeec1eeeeeec1cccccc1cccccccc1cccccc1cccccccc1cccccc1
 b000000b16666661000000000000000000000000d11111111111111e1eeeeee11eeeeee11eeeeee11eeeeee111010011cccccccc11010011cccccccc11010011
-3000000300000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeee1111111111eeeeee101c0cc1cccccccccc1c0cc1cccccccccc1c0cc10
-0300003000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee101c0cc1cccccccccc1c0cc1cccccccccc1c0cc10
-0003300000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee10101001cccccccccc101001cccccccccc1010010
-0030030000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee101cccc1cccccccccc1cccc1cccccccccc1cccc10
-0030030000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee101cccc1cccccccccc1cccc1cccccccccc1cccc10
-0003300000000000000000000000000000000000e1cccccccccccc1e1eeeeee11eeeeeeeeeeeeeeeeeeeeee10100101eeeeeeeeee100101eeeeeeeeee1001010
-0300003000000000000000000000000000000000c1cccccccccccc1c1cccccc11cccccccceeeeeecccccccc101cc0c1cccccccccc1cc0c1cccccccccc1cc0c10
-300000030000000000000000000000000000000011cccccccccccc1111111111111111111eeeeee11111111101cc0c111111111111cc0c111111111111cc0c10
+0000000000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeee1111111111eeeeee101c0cc1cccccccccc1c0cc1cccccccccc1c0cc10
+0000000000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee101c0cc1cccccccccc1c0cc1cccccccccc1c0cc10
+0000000000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee10101001cccccccccc101001cccccccccc1010010
+0000000000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee101cccc1cccccccccc1cccc1cccccccccc1cccc10
+0000000000000000000000000000000000000000c1cccccccccccc1c1eeeeee11eeeeeeeeeeeeeeeeeeeeee101cccc1cccccccccc1cccc1cccccccccc1cccc10
+0000000000000000000000000000000000000000e1cccccccccccc1e1eeeeee11eeeeeeeeeeeeeeeeeeeeee10100101eeeeeeeeee100101eeeeeeeeee1001010
+0000000000000000000000000000000000000000c1cccccccccccc1c1cccccc11cccccccceeeeeecccccccc101cc0c1cccccccccc1cc0c1cccccccccc1cc0c10
+000000000000000000000000000000000000000011cccccccccccc1111111111111111111eeeeee11111111101cc0c111111111111cc0c111111111111cc0c10
 33333333000000000000000000000000000000000000000011111111cddddddd11111111111111111111111111001011cddddddd11001011cddddddd11001011
 3000000300000000000000000000000000000000000000001eeeeee1deeeeeee1eeeeeeeeeeeeeeeeeeeeee11ecccce1d111111e1ecccce1deeeeeee1ecccce1
 3000000300000000000000000000000000000000000000001eeeeee1de00000e1eeeeeeeeeeeeeeeeeeeeee11ecccce1d1eeee1e1ecccce1deeeeeee1ecccce1
@@ -1070,7 +1119,7 @@ ll5500990000pp00ll555555555555550000000000000000ll55555555555555ll55555555555555
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
 __gff__
-0000000000010101010101010101010104030000000101010101010101010101010000000001010101010101010101010100000000000108010101011101000101010101010000000000000000000000010101010101000000000000000000000101010101010101010000010101000001010101010101010100000101010000
+0000000000010101010101010101010104030000000101010101010101010101010000000001010101010101010101010100000000000108010101011101000101010101010000000000000000000000010101010101000000000000000000000101010101010101010000010101000001010101010101010101010101010000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 0b0c0c0c0c0c0c0f00000b0c0c0c0f00000b0c0c0c0c0c0c0c0c0c0f000000000839390a08393939390a000000000000000b0c0c0c0c0c0f000000080c0c0c0f0000000b0c0c0c0a0000080c0c0c0f000000000b0c0c0a0000000000080c0c0c0c0c0c0c0c0c0a000000000000000b0c0c0c0f00000000000000000000000000
