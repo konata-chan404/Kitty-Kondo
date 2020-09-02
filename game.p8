@@ -110,8 +110,9 @@ function game_draw()
 
 	-- draw debugging values
     camera()
-    print(#moves)
-    --print(player.ypos)
+    -- print(#moves)
+	-- print(player.flip)
+	-- print(debug)
 	--print(#boxes)
 	--print(#block_points)
 	--print(debug)
@@ -149,8 +150,8 @@ function create_player()
 
 		if (btnp(0) or direction == 0)  -- Move left
 		then
-			debug = "moving left"
-			self.flip = true and not direction==nil -- player now facing opposite direction of the it's sprite
+			debug =  direction
+			self.flip = true and direction==nil -- player now facing opposite direction of the it's sprite
 			if direction == nil then
 			moves[#moves + 1] = {direction=0} end
 
@@ -199,8 +200,8 @@ function create_player()
 
 		if (btnp(1) or direction == 1) -- move right
 		then
-			debug = "moving right"
-			self.flip = false and not direction==nil -- player now facing the direction of it's sprite
+			debug = direction
+			self.flip = true and direction~=nil -- player now facing the direction of it's sprite
 			if direction == nil then
 			moves[#moves + 1] = {direction=1} end
 
