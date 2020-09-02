@@ -26,7 +26,7 @@ end
 
 function menu_update()
 	if btnp(4) then
-		load_game()
+		help_menu_init()
 	end
 end
 
@@ -43,6 +43,26 @@ function menu_draw()
 
 	t += 1
 end
+
+
+-- help menu functions
+function help_menu_init() 
+	_update = help_menu_update
+	_draw = help_menu_draw
+end
+
+function help_menu_update()
+	if btnp(4) then
+		load_game()
+	end
+end
+
+function help_menu_draw()
+	cls(3)
+	print("z - rewind", 32-20, 30)
+	print("x - restart",32-20, 40)
+end
+
 
 -- main game functions
 function load_game()
