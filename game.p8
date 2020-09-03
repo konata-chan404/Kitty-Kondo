@@ -89,7 +89,8 @@ function game_update()
 	player:move(nil)
 	
 	if btnp(5) then
-		restart_level()
+		--restart_level()
+		load_next_level()
 	end
 
 	if btnp(4) then
