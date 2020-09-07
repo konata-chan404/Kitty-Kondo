@@ -7,9 +7,13 @@ __lua__
 
 
 function _init()
+	cartdata("konata_kitty-kondo_1")
 	debug = 0
+
+
 	poke(0x5f2c,3)
 	poke(0x5f2e,1)
+	
 	menu_init()
 end
 
@@ -27,7 +31,7 @@ end
 
 function menu_update()
 	if btnp(4) then
-		help_menu_init()
+		save_menu_init()
 	end
 end
 
@@ -45,6 +49,30 @@ function menu_draw()
 	t += 1
 end
 
+-- save menu functions
+function save_menu_init() 
+	_update = save_menu_update
+	_draw = save_menu_draw
+end
+
+function save_menu_update()
+	if btnp(4) then
+		load_game()
+	end
+
+	if btnp(5) then
+		poke(0x5e00, 1)
+		help_menu_init()
+	end
+end
+
+function save_menu_draw()
+	cls(0)
+	print("z - continue", 32-22, 20, 6)
+	print("x - reset",32-18, 40, 6)
+end
+
+
 
 -- help menu functions
 function help_menu_init() 
@@ -60,7 +88,7 @@ end
 
 function help_menu_draw()
 	cls(0)
-	print("z - rewind", 32-20, 20, 6)
+	print("z - undo", 32-14, 20, 6)
 	print("x - restart",32-20, 40, 6)
 end
 
@@ -111,8 +139,8 @@ function game_init()
 	create_player()
 	-- camera(player.xpos, player.ypos) - this line is pointless. were updating the camera position every frame anyway so whats the point?
 
-
-	load_level(levels[1], true)
+	current_level.index = @0x5e00
+	load_level(levels[current_level.index], false)
 end
 
 function game_update()
@@ -891,6 +919,10 @@ function load_level(level, next_level)
 	if level.palette ~= nil then
 		current_level.palette = level.palette
 		load_palette(current_level.palette)
+	
+	else
+		current_level.palette = {128,0,2,136,132,4,137,9,129,131,139,138,133,5,134,7}
+		load_palette(current_level.palette)
 	end
 
 	if level.music ~= nil then
@@ -922,6 +954,7 @@ end
 
 function load_next_level()
 	local new_level = current_level.index+1
+	poke(0x5e00, new_level)
 	if not (new_level > #levels) then
 		load_level(levels[new_level], true)
 	else 
