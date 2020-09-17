@@ -128,9 +128,9 @@ end
 
 -- main game functions
 function load_game()
-	game_init()
 	_update = game_update
 	_draw = game_draw
+	game_init()
 end
 
 function game_init()
@@ -139,8 +139,8 @@ function game_init()
 	create_player()
 	-- camera(player.xpos, player.ypos) - this line is pointless. were updating the camera position every frame anyway so whats the point?
 
-	current_level.index = @0x5e00
-	load_level(levels[current_level.index], false)
+	current_level.index = @0x5e00-1
+	load_next_level()
 end
 
 function game_update()
@@ -171,7 +171,6 @@ function game_draw()
 
 	-- draw debugging values
     camera()
-    -- print(#moves)
 	-- print(player.flip)
 	-- print(debug)
 	--print(#boxes)
@@ -863,7 +862,10 @@ function create_game_stuff()
 	}
 
 	current_level = {
-		index = 0
+		index = 0,
+		celx = 0,
+		cely = 0,
+		palette = {}
 	}
 	
 	cam = {
@@ -871,6 +873,7 @@ function create_game_stuff()
 		ypos = 0
 	}
 
+	moves = {}
 	
 end
 
@@ -893,7 +896,7 @@ function load_level(level, next_level)
 	local last_palette = current_level.palette
 
 	current_level = {
-		index = current_level.index + (next_level and 1 or 0),
+		index = current_level.index,
 		celx = level.celx_start,
 		cely = level.cely_start,
 		sx = 0,
@@ -953,11 +956,12 @@ function load_level(level, next_level)
 end
 
 function load_next_level()
-	local new_level = current_level.index+1
-	poke(0x5e00, new_level)
-	if not (new_level > #levels) then
-		load_level(levels[new_level], true)
+	current_level.index = current_level.index+1
+	poke(0x5e00, current_level.index)
+	if not (current_level.index > #levels) then
+		load_level(levels[current_level.index], true)
 	else 
+		debug = "swag"
 		end_screen_init()
 	end
 end
